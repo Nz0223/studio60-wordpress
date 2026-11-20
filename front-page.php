@@ -107,7 +107,7 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 							</div>
 							<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
 							<p><?php echo esc_html( wp_strip_all_tags( $service_description ) ); ?></p>
-							<a class="text-link" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Découvrir', 'studio60' ); ?><span aria-hidden="true">↗</span></a>
+							
 						</article>
 					<?php endwhile; ?>
 				<?php else : ?>
@@ -127,7 +127,7 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 					<p class="eyebrow"><?php esc_html_e( 'Notre sélection', 'studio60' ); ?></p>
 					<h2><?php esc_html_e( 'Des projets pensés pour faire la différence.', 'studio60' ); ?></h2>
 				</div>
-				<a class="text-link text-link--large" href="<?php echo esc_url( get_post_type_archive_link( 'projets' ) ); ?>"><?php esc_html_e( 'Tous les projets', 'studio60' ); ?><span aria-hidden="true">↗</span></a>
+				
 			</div>
 
 			<div class="projects-grid">
