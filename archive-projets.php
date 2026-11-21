@@ -1,44 +1,57 @@
 <?php
 /**
- * Archive Projets Template
+ * Archive template for Studio60 projects.
+ *
+ * @package studio60
  */
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+get_header();
 ?>
-<?php get_header(); ?>
-
-<main id="primary" class="site-main">
+<section class="archive-hero">
 	<div class="max-width">
-		<div class="page-header">
-			<h1 class="page-title"><?php post_type_archive_title(); ?></h1>
-			<p class="page-subtitle"><?php _e( 'Découvrez tous nos projets', 'studio60' ); ?></p>
-		</div>
-		
-		<div class="projects-archive">
-			<?php
-			$projets_query = new WP_Query( [
-				'post_type' => 'projets',
-				'posts_per_page' => -1,
-				'order' => 'DESC',
-				'meta_key' => 'projet_annee',
-			] );
-			if ( $projets_query->have_posts() ) : while ( $projets_query->have_posts() ) : the_post();
-				$project_image = get_field( 'projet_image_principale' );
-				$project_category = get_field( 'projet_categorie' );
-				$project_year = get_field( 'projet_annee' );
+		<p class="eyebrow"><?php esc_html_e( 'Nos réalisations', 'studio60' ); ?></p>
+		<h1><?php post_type_archive_title(); ?></h1>
+		<p><?php esc_html_e( 'Découvrez une sélection de projets et de collaborations.', 'studio60' ); ?></p>
+	</div>
+</section>
+<section class="projects-section">
+	<div class="max-width">
+		<div class="projects-grid">
+			<?php if ( have_posts() ) : while ( have_posts() ) : the_post();
+				$image = function_exists( 'get_field' ) ? get_field( 'projet_image_principale' ) : '';
+				$category = function_exists( 'get_field' ) ? get_field( 'projet_categorie' ) : '';
+				$year = function_exists( 'get_field' ) ? get_field( 'projet_annee' ) : '';
+				$image_url = is_array( $image ) && ! empty( $image['url'] ) ? $image['url'] : $image;
 				?>
-				<article class="projet-card--archive">
-					<div class="projet-card__image--archive" style="background-image: url('<?php echo esc_url( $project_image ); ?>');">
-						<span class="projet-card__category--archive"><?php echo esc_html( $project_category ? $project_category->name : '' ); ?></span>
-						<h3 class="projet-card__title--archive"><?php the_title(); ?></h3>
-						<p class="projet-card__year--archive"><?php echo esc_html( $project_year ); ?></p>
+				<article <?php post_class( 'project-card' ); ?>>
+					<div class="project-card__media">
+						<?php if ( $image_url ) : ?>
+							<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy">
+						<?php elseif ( has_post_thumbnail() ) : ?>
+							<?php the_post_thumbnail( 'large' ); ?>
+						<?php endif; ?>
+					</div>
+					<div class="project-card__content">
+						<p class="project-card__meta"><?php
+							if ( $category ) {
+								echo esc_html( is_object( $category ) ? $category->name : ( is_array( $category ) && isset( $category['name'] ) ? $category['name'] : $category ) );
+							}
+							if ( $year ) {
+								echo ' · ' . esc_html( $year );
+							}
+						?></p>
+						<h2><?php the_title(); ?></h2>
+						<?php the_excerpt(); ?>
 					</div>
 				</article>
-			<?php endwhile; wp_reset_postdata(); ?>
+			<?php endwhile; else : ?>
+				<p><?php esc_html_e( 'Aucun projet publié pour le moment.', 'studio60' ); ?></p>
+			<?php endif; ?>
 		</div>
+		<?php the_posts_pagination(); ?>
 	</div>
-</main>
-
-<?php get_footer(); ?><?php endif; ?>
+</section>
+<?php
+get_footer();

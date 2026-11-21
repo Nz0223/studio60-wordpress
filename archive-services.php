@@ -1,49 +1,47 @@
 <?php
 /**
- * Archive Services Template
+ * Archive template for Studio60 services.
+ *
+ * @package studio60
  */
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+get_header();
 ?>
-
-<?php get_header(); ?>
-
-<main id="primary" class="site-main">
+<section class="archive-hero">
 	<div class="max-width">
-		<div class="page-header">
-			<h1 class="page-title"><?php post_type_archive_title(); ?></h1>
-			<p class="page-subtitle"><?php _e( 'Découvrez tous nos services', 'studio60' ); ?></p>
-		</div>
-		
-		<div class="services-archive">
-			<?php
-			$services_query = new WP_Query( [
-				'post_type' => 'services',
-				'posts_per_page' => -1,
-				'order' => 'ASC',
-				'orderby' => 'meta_value_num',
-				'meta_key' => 'service_order',
-			] );
-			
-			if ( $services_query->have_posts() ) : while ( $services_query->have_posts() ) : the_post();
-				$service_icon = get_field( 'service_icon' );
-				?>
-				<article class="service-card--archive">
-					<div class="service-card__image--archive" style="background-image: url('<?php echo esc_url( $service_icon ); ?>');">
-						<?php if ( $service_icon ) : ?>
-							<span class="service-card__icon--archive <?= esc_html( get_the_title() ); ?>-icon</span>
-						<?php endif; ?>
-					</div>
-					<div class="service-card__info--archive">
-						<h3 class="service-card__title--archive"><?php the_title(); ?></h3>
-						<p class="service-card__description--archive"><?php the_excerpt(); ?></p>
-					</div>
-				</article>
-			<?php endwhile; endif; wp_reset_postdata(); ?>
-		</div>
+		<p class="eyebrow"><?php esc_html_e( 'Notre expertise', 'studio60' ); ?></p>
+		<h1><?php post_type_archive_title(); ?></h1>
+		<p><?php esc_html_e( 'Des expertises complémentaires pour accompagner vos ambitions.', 'studio60' ); ?></p>
 	</div>
-</main>
-
-<?php get_footer(); ?>
+</section>
+<section class="services-section">
+	<div class="max-width">
+		<div class="services-grid">
+			<?php if ( have_posts() ) : while ( have_posts() ) : the_post();
+				$icon = function_exists( 'get_field' ) ? get_field( 'service_icon' ) : '';
+				$description = function_exists( 'get_field' ) ? get_field( 'service_description' ) : '';
+				$icon_url = is_array( $icon ) && ! empty( $icon['url'] ) ? $icon['url'] : $icon;
+				?>
+				<article <?php post_class( 'service-card' ); ?>>
+					<?php if ( $icon_url ) : ?>
+						<img class="service-card__icon" src="<?php echo esc_url( $icon_url ); ?>" alt="" loading="lazy">
+					<?php endif; ?>
+					<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+					<?php if ( $description ) : ?>
+						<p><?php echo esc_html( $description ); ?></p>
+					<?php else : ?>
+						<?php the_excerpt(); ?>
+					<?php endif; ?>
+					<a class="text-link" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Découvrir', 'studio60' ); ?></a>
+				</article>
+			<?php endwhile; else : ?>
+				<p><?php esc_html_e( 'Aucun service publié pour le moment.', 'studio60' ); ?></p>
+			<?php endif; ?>
+		</div>
+		<?php the_posts_pagination(); ?>
+	</div>
+</section>
+<?php
+get_footer();

@@ -10,43 +10,76 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$page_id = get_queried_object_id();
-$hero_title = function_exists( 'get_field' ) ? get_field( 'hero_title', $page_id ) : '';
-$hero_subtitle = function_exists( 'get_field' ) ? get_field( 'hero_subtitle', $page_id ) : '';
-$hero_button_text = function_exists( 'get_field' ) ? get_field( 'hero_button_text', $page_id ) : '';
-$hero_background = function_exists( 'get_field' ) ? get_field( 'hero_background_image', $page_id ) : '';
-$about_kicker = function_exists( 'get_field' ) ? get_field( 'about_kicker', $page_id ) : '';
-$about_title = function_exists( 'get_field' ) ? get_field( 'about_title', $page_id ) : '';
-$about_text = function_exists( 'get_field' ) ? get_field( 'about_text', $page_id ) : '';
-$about_vision = function_exists( 'get_field' ) ? get_field( 'about_vision', $page_id ) : '';
-$about_mission = function_exists( 'get_field' ) ? get_field( 'about_mission', $page_id ) : '';
+$page_id = (int) get_queried_object_id();
+$front_id = (int) get_option( 'page_on_front' );
 
-$hero_title = $hero_title ? $hero_title : __( 'Nous transformons vos ambitions en expériences remarquables.', 'studio60' );
-$hero_subtitle = $hero_subtitle ? $hero_subtitle : __( 'Nous accompagnons les marques et les organisations dans leur développement grâce à des stratégies créatives et des solutions digitales pertinentes.', 'studio60' );
-$hero_button_text = $hero_button_text ? $hero_button_text : __( 'Découvrir nos réalisations', 'studio60' );
-$about_kicker = $about_kicker ? $about_kicker : __( 'L’esprit Studio60', 'studio60' );
-$about_title = $about_title ? $about_title : __( 'La créativité au service de vos ambitions.', 'studio60' );
-$about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, créativité et maîtrise digitale pour concevoir des expériences cohérentes, utiles et mémorables.', 'studio60' );
+if ( $front_id && function_exists( 'pll_get_post' ) && function_exists( 'pll_current_language' ) ) {
+	$translated_front_id = pll_get_post( $front_id, pll_current_language( 'slug' ) );
+	if ( $translated_front_id ) {
+		$page_id = (int) $translated_front_id;
+	}
+}
+
+$acf_fields = array(
+	'hero_title', 'hero_subtitle', 'hero_button_text', 'hero_background_image',
+	'hero_tagline', 'hero_support_text', 'hero_contact_button',
+	'about_kicker', 'about_title', 'about_text', 'about_vision', 'about_mission',
+	'about_button_text', 'vision_label', 'mission_label',
+	'services_kicker', 'services_title', 'services_text',
+	'projects_kicker', 'projects_title',
+	'contact_kicker', 'contact_title', 'contact_text', 'contact_secondary_text',
+);
+
+foreach ( $acf_fields as $field ) {
+	$$field = function_exists( 'get_field' ) ? get_field( $field, $page_id ) : '';
+}
+
+$hero_title = $hero_title ?: studio60_t( 'Nous transformons vos ambitions en expériences remarquables.' );
+$hero_subtitle = $hero_subtitle ?: studio60_t( 'Nous accompagnons les marques et les organisations dans leur développement grâce à des stratégies créatives et des solutions digitales pertinentes.' );
+$hero_button_text = $hero_button_text ?: studio60_t( 'Découvrir nos réalisations' );
+$hero_tagline = $hero_tagline ?: studio60_t( 'Studio60 · Stratégie · Créativité · Digital' );
+$hero_support_text = $hero_support_text ?: studio60_t( 'Des idées fortes. Des expériences utiles.' );
+$hero_contact_button = $hero_contact_button ?: studio60_t( 'Parlons de votre projet' );
+
+$about_kicker = $about_kicker ?: studio60_t( 'L’esprit Studio60' );
+$about_title = $about_title ?: studio60_t( 'La créativité au service de vos ambitions.' );
+$about_text = $about_text ?: studio60_t( 'Nous réunissons stratégie, créativité et maîtrise digitale pour concevoir des expériences cohérentes, utiles et mémorables.' );
+
+$services_kicker = $services_kicker ?: studio60_t( 'Ce que nous faisons' );
+$services_title = $services_title ?: studio60_t( 'Des expertises qui donnent forme à vos idées.' );
+$services_text = $services_text ?: studio60_t( 'Nous associons réflexion stratégique, sens du design et maîtrise technique pour faire avancer les marques.' );
+
+$projects_kicker = $projects_kicker ?: studio60_t( 'Notre sélection' );
+$projects_title = $projects_title ?: studio60_t( 'Des projets pensés pour faire la différence.' );
+
+$about_button_text = $about_button_text ?: studio60_t( 'Construisons quelque chose ensemble' );
+$vision_label = $vision_label ?: studio60_t( 'Notre vision' );
+$mission_label = $mission_label ?: studio60_t( 'Notre mission' );
+
+$contact_kicker = $contact_kicker ?: studio60_t( 'Entrons en contact' );
+$contact_title = $contact_title ?: studio60_t( 'Votre prochain projet commence ici.' );
+$contact_text = $contact_text ?: studio60_t( 'Parlez-nous de votre idée, de vos objectifs et des défis que vous souhaitez relever. Nous serons ravis d’en discuter.' );
+$contact_secondary_text = $contact_secondary_text ?: studio60_t( 'Une conversation peut être le début de grandes choses.' );
 ?>
 
 <main id="primary" class="site-main">
 	<section class="hero-section" id="accueil">
-		<div class="hero-section__backdrop" <?php if ( $hero_background ) : ?>style="background-image: url('<?php echo esc_url( $hero_background ); ?>')"<?php endif; ?>></div>
+		<div class="hero-section__backdrop" <?php if ( $hero_background_image ) : ?>style="background-image: url('<?php echo esc_url( $hero_background_image ); ?>')"<?php endif; ?>></div>
 		<div class="hero-section__orb hero-section__orb--one" aria-hidden="true"></div>
 		<div class="hero-section__orb hero-section__orb--two" aria-hidden="true"></div>
 		<div class="hero-section__grid" aria-hidden="true"></div>
 		<div class="hero-section__inner max-width">
 			<div class="hero-copy" data-reveal>
-				<p class="eyebrow eyebrow--light"><?php esc_html_e( 'Studio60 · Stratégie · Créativité · Digital', 'studio60' ); ?></p>
+				<p class="eyebrow eyebrow--light"><?php echo esc_html( $hero_tagline ); ?></p>
 				<h1><?php echo esc_html( $hero_title ); ?></h1>
 				<p class="hero-copy__lead"><?php echo esc_html( $hero_subtitle ); ?></p>
 				<div class="hero-actions">
 					<a class="button button--light" href="#projets"><?php echo esc_html( $hero_button_text ); ?><span aria-hidden="true">↗</span></a>
-					<a class="button button--outline-light" href="#contact"><?php esc_html_e( 'Parlons de votre projet', 'studio60' ); ?></a>
+					<a class="button button--outline-light" href="#contact"><?php echo esc_html( $hero_contact_button ); ?></a>
 				</div>
 				<div class="hero-meta">
 					<span class="hero-meta__line"></span>
-					<span><?php esc_html_e( 'Des idées fortes. Des expériences utiles.', 'studio60' ); ?></span>
+					<span><?php echo esc_html( $hero_support_text ); ?></span>
 				</div>
 			</div>
 			<div class="hero-art" aria-hidden="true" data-reveal>
@@ -58,17 +91,17 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 				<div class="hero-art__dot hero-art__dot--three"></div>
 			</div>
 		</div>
-		<a class="hero-scroll" href="#services"><span></span><?php esc_html_e( 'Défiler pour découvrir', 'studio60' ); ?></a>
+		<a class="hero-scroll" href="#services"><span></span><?php echo esc_html( studio60_t( 'Défiler pour découvrir' ) ); ?></a>
 	</section>
 
 	<section class="section services-section" id="services">
 		<div class="max-width">
 			<div class="section-heading" data-reveal>
 				<div>
-					<p class="eyebrow"><?php esc_html_e( 'Ce que nous faisons', 'studio60' ); ?></p>
-					<h2><?php esc_html_e( 'Des expertises qui donnent forme à vos idées.', 'studio60' ); ?></h2>
+					<p class="eyebrow"><?php echo esc_html( $services_kicker ); ?></p>
+					<h2><?php echo esc_html( $services_title ); ?></h2>
 				</div>
-				<p class="section-heading__intro"><?php esc_html_e( 'Nous associons réflexion stratégique, sens du design et maîtrise technique pour faire avancer les marques.', 'studio60' ); ?></p>
+				<p class="section-heading__intro"><?php echo esc_html( $services_text ); ?></p>
 			</div>
 
 			<div class="services-grid">
@@ -112,7 +145,7 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 					<?php endwhile; ?>
 				<?php else : ?>
 					<div class="empty-state">
-						<p><?php esc_html_e( 'Nos expertises seront bientôt présentées ici.', 'studio60' ); ?></p>
+						<p><?php echo esc_html( studio60_t( 'Nos expertises seront bientôt présentées ici.' ) ); ?></p>
 					</div>
 				<?php endif; ?>
 				<?php wp_reset_postdata(); ?>
@@ -124,8 +157,8 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 		<div class="max-width">
 			<div class="section-heading section-heading--projects" data-reveal>
 				<div>
-					<p class="eyebrow"><?php esc_html_e( 'Notre sélection', 'studio60' ); ?></p>
-					<h2><?php esc_html_e( 'Des projets pensés pour faire la différence.', 'studio60' ); ?></h2>
+					<p class="eyebrow"><?php echo esc_html( $projects_kicker ); ?></p>
+					<h2><?php echo esc_html( $projects_title ); ?></h2>
 				</div>
 				
 			</div>
@@ -192,7 +225,7 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 					<?php endwhile; ?>
 				<?php else : ?>
 					<div class="empty-state empty-state--wide">
-						<p><?php esc_html_e( 'Les réalisations Studio60 seront bientôt disponibles.', 'studio60' ); ?></p>
+						<p><?php echo esc_html( studio60_t( 'Les réalisations Studio60 seront bientôt disponibles.' ) ); ?></p>
 					</div>
 				<?php endif; ?>
 				<?php wp_reset_postdata(); ?>
@@ -207,17 +240,17 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 				<p class="eyebrow eyebrow--light"><?php echo esc_html( $about_kicker ); ?></p>
 				<h2><?php echo esc_html( $about_title ); ?></h2>
 				<p class="about-section__text"><?php echo esc_html( $about_text ); ?></p>
-				<a class="button button--light" href="#contact"><?php esc_html_e( 'Construisons quelque chose ensemble', 'studio60' ); ?><span aria-hidden="true">↗</span></a>
+				<a class="button button--light" href="#contact"><?php echo esc_html( $about_button_text ); ?><span aria-hidden="true">↗</span></a>
 			</div>
 			<div class="about-pillars" data-reveal>
 				<div class="about-pillar">
 					<span class="about-pillar__index">01</span>
-					<h3><?php esc_html_e( 'Notre vision', 'studio60' ); ?></h3>
+					<h3><?php echo esc_html( $vision_label ); ?></h3>
 					<p><?php echo esc_html( $about_vision ? $about_vision : __( 'Faire du digital et de la création des leviers concrets de transformation.', 'studio60' ) ); ?></p>
 				</div>
 				<div class="about-pillar">
 					<span class="about-pillar__index">02</span>
-					<h3><?php esc_html_e( 'Notre mission', 'studio60' ); ?></h3>
+					<h3><?php echo esc_html( $mission_label ); ?></h3>
 					<p><?php echo esc_html( $about_mission ? $about_mission : __( 'Concevoir des solutions pertinentes, soignées et durables pour chaque ambition.', 'studio60' ) ); ?></p>
 				</div>
 			</div>
@@ -227,12 +260,12 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 	<section class="section contact-section" id="contact">
 		<div class="max-width contact-section__inner">
 			<div class="contact-section__intro" data-reveal>
-				<p class="eyebrow"><?php esc_html_e( 'Entrons en contact', 'studio60' ); ?></p>
-				<h2><?php esc_html_e( 'Votre prochain projet commence ici.', 'studio60' ); ?></h2>
-				<p><?php esc_html_e( 'Parlez-nous de votre idée, de vos objectifs et des défis que vous souhaitez relever. Nous serons ravis d’en discuter.', 'studio60' ); ?></p>
+				<p class="eyebrow"><?php echo esc_html( $contact_kicker ); ?></p>
+				<h2><?php echo esc_html( $contact_title ); ?></h2>
+				<p><?php echo esc_html( $contact_text ); ?></p>
 				<div class="contact-note">
 					<span class="contact-note__icon" aria-hidden="true">✳</span>
-					<span><?php esc_html_e( 'Une conversation peut être le début de grandes choses.', 'studio60' ); ?></span>
+					<span><?php echo esc_html( $contact_secondary_text ); ?></span>
 				</div>
 			</div>
 
@@ -241,46 +274,47 @@ $about_text = $about_text ? $about_text : __( 'Nous réunissons stratégie, cré
 				$contact_status = isset( $_GET['studio60_contact'] ) ? sanitize_key( wp_unslash( $_GET['studio60_contact'] ) ) : '';
 				if ( 'sent' === $contact_status ) :
 					?>
-					<div class="form-notice form-notice--success" role="status"><?php esc_html_e( 'Merci. Votre message a bien été transmis.', 'studio60' ); ?></div>
+					<div class="form-notice form-notice--success" role="status"><?php echo esc_html( studio60_t( 'Merci. Votre message a bien été transmis.' ) ); ?></div>
 				<?php elseif ( 'invalid' === $contact_status ) : ?>
-					<div class="form-notice form-notice--error" role="alert"><?php esc_html_e( 'Vérifiez votre nom, votre adresse e-mail et votre message.', 'studio60' ); ?></div>
+					<div class="form-notice form-notice--error" role="alert"><?php echo esc_html( studio60_t( 'Vérifiez votre nom, votre adresse e-mail et votre message.' ) ); ?></div>
 				<?php elseif ( 'mail_error' === $contact_status ) : ?>
-					<div class="form-notice form-notice--error" role="alert"><?php esc_html_e( 'Le message n’a pas pu être envoyé. Veuillez réessayer ou nous contacter par e-mail.', 'studio60' ); ?></div>
+					<div class="form-notice form-notice--error" role="alert"><?php echo esc_html( studio60_t( 'Le message n’a pas pu être envoyé. Veuillez réessayer ou nous contacter par e-mail.' ) ); ?></div>
 				<?php endif; ?>
 
 				<form class="contact-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
 					<input type="hidden" name="action" value="studio60_contact">
+				<input type="hidden" name="studio60_return_url" value="<?php echo esc_url( get_permalink() ); ?>">
 					<?php wp_nonce_field( 'studio60_contact', 'studio60_contact_nonce' ); ?>
 					<div class="form-honeypot" aria-hidden="true">
-						<label for="studio60-website"><?php esc_html_e( 'Ne pas remplir ce champ', 'studio60' ); ?></label>
+						<label for="studio60-website"><?php echo esc_html( studio60_t( 'Ne pas remplir ce champ' ) ); ?></label>
 						<input id="studio60-website" type="text" name="studio60_website" tabindex="-1" autocomplete="off">
 					</div>
 					<div class="form-row">
 						<div class="form-field">
-							<label for="studio60-name"><?php esc_html_e( 'Nom complet *', 'studio60' ); ?></label>
+							<label for="studio60-name"><?php echo esc_html( studio60_t( 'Nom complet *' ) ); ?></label>
 							<input id="studio60-name" type="text" name="studio60_name" autocomplete="name" required>
 						</div>
 						<div class="form-field">
-							<label for="studio60-email"><?php esc_html_e( 'Adresse e-mail *', 'studio60' ); ?></label>
+							<label for="studio60-email"><?php echo esc_html( studio60_t( 'Adresse e-mail *' ) ); ?></label>
 							<input id="studio60-email" type="email" name="studio60_email" autocomplete="email" required>
 						</div>
 					</div>
 					<div class="form-row">
 						<div class="form-field">
-							<label for="studio60-company"><?php esc_html_e( 'Entreprise', 'studio60' ); ?></label>
+							<label for="studio60-company"><?php echo esc_html( studio60_t( 'Entreprise' ) ); ?></label>
 							<input id="studio60-company" type="text" name="studio60_company" autocomplete="organization">
 						</div>
 						<div class="form-field">
-							<label for="studio60-subject"><?php esc_html_e( 'Sujet', 'studio60' ); ?></label>
+							<label for="studio60-subject"><?php echo esc_html( studio60_t( 'Sujet' ) ); ?></label>
 							<input id="studio60-subject" type="text" name="studio60_subject">
 						</div>
 					</div>
 					<div class="form-field">
-						<label for="studio60-message"><?php esc_html_e( 'Votre message *', 'studio60' ); ?></label>
+						<label for="studio60-message"><?php echo esc_html( studio60_t( 'Votre message *' ) ); ?></label>
 						<textarea id="studio60-message" name="studio60_message" rows="5" required></textarea>
 					</div>
-					<button class="button button--primary form-submit" type="submit"><?php esc_html_e( 'Envoyer le message', 'studio60' ); ?><span aria-hidden="true">↗</span></button>
-					<p class="form-privacy"><?php esc_html_e( 'Les informations transmises sont utilisées uniquement pour répondre à votre demande.', 'studio60' ); ?></p>
+					<button class="button button--primary form-submit" type="submit"><?php echo esc_html( studio60_t( 'Envoyer le message' ) ); ?><span aria-hidden="true">↗</span></button>
+					<p class="form-privacy"><?php echo esc_html( studio60_t( 'Les informations transmises sont utilisées uniquement pour répondre à votre demande.' ) ); ?></p>
 				</form>
 			</div>
 		</div>

@@ -1,44 +1,37 @@
 <?php
 /**
- * Single Projet Template
+ * Single project template.
+ *
+ * @package studio60
  */
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+get_header();
 ?>
-
-<article id="post-<?php the_ID(); ?>" <?php post_class( 'single-projet' ); ?>>
-	<div class="single-projet__featured-image">
-		<?php the_post_thumbnail(); ?>
+<section class="single-page">
+	<div class="max-width">
+		<?php while ( have_posts() ) : the_post();
+			$image = function_exists( 'get_field' ) ? get_field( 'projet_image_principale' ) : '';
+			$year = function_exists( 'get_field' ) ? get_field( 'projet_annee' ) : '';
+			$external = function_exists( 'get_field' ) ? get_field( 'projet_externe' ) : '';
+			$image_url = is_array( $image ) && ! empty( $image['url'] ) ? $image['url'] : $image;
+			?>
+			<article id="post-<?php the_ID(); ?>" <?php post_class( 'single-content' ); ?>>
+				<p class="eyebrow"><?php esc_html_e( 'Projet', 'studio60' ); ?><?php echo $year ? ' · ' . esc_html( $year ) : ''; ?></p>
+				<h1><?php the_title(); ?></h1>
+				<?php if ( $image_url ) : ?>
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>">
+				<?php elseif ( has_post_thumbnail() ) : ?>
+					<?php the_post_thumbnail( 'large' ); ?>
+				<?php endif; ?>
+				<div class="entry-content"><?php the_content(); ?></div>
+				<?php if ( $external ) : ?>
+					<p><a class="button button--primary" href="<?php echo esc_url( $external ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Voir le projet', 'studio60' ); ?></a></p>
+				<?php endif; ?>
+			</article>
+		<?php endwhile; ?>
 	</div>
-	
-	<div class="single-projet__content">
-		<h1 class="single-projet__title"><?php the_title(); ?></h1>
-		<div class="single-projet__excerpt">
-			<?php the_excerpt(); ?>
-		</div>
-		
-		<div class="single-projet__meta">
-			<span class="single-projet__category"><?php the_category( ', ' ); ?></span>
-			<span class="single-projet__author"><?php the_author(); ?></span>
-			<span class="single-projet__year"><?php the_field( 'projet_annee' ); ?></span>
-		</div>
-		
-		<div class="single-projet__description">
-			<?php the_content(); ?>
-		</div>
-		
-		<div class="single-projet__external-link">
-			<?php $external = get_field( 'projet_externe' );
-			if ( $external ) : ?>
-				<a href="<?php echo esc_url( $external ); ?>" class="btn btn-secondary" target="_blank" rel="noopener">
-					Voir sur le site externe
-				</a>
-			<?php endif; ?>
-		</div>
-	</div>
-</article>
+</section>
 <?php
-wp_hook( 'single_projet_end' );
-?>
+get_footer();

@@ -1,123 +1,104 @@
 <?php
 /**
- * Header template for STUDIO60
- * Contains the main header with logo, navigation, and language selector
+ * Studio60 site header.
+ *
+ * @package studio60
  */
 
-// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+$studio60_home_url = function_exists( 'pll_home_url' ) ? pll_home_url() : home_url( '/' );
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="profile" href="https://gmpg.org/php/rules/2014">
-	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
-
+	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<?php wp_head(); ?>
 </head>
-
 <body <?php body_class(); ?>>
-	<!-- Skip link -->
-	<a href="#primary" class="skip-link"><?php _e( 'Sauter au contenu principal', 'studio60' ); ?></a>
+<?php wp_body_open(); ?>
+<div id="page" class="site">
+	<a class="skip-link" href="#primary"><?php echo esc_html( studio60_t( 'Aller au contenu principal' ) ); ?></a>
 
 	<header class="site-header" id="masthead">
-		<div class="site-header__inner">
-			<div class="max-width">
-
-				<!-- Logo -->
-				<figure class="site-header__logo">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>">
-						<?php
-						// Logo via Customizer ou ACF
-						$logo = get_theme_mod( 'logo', '' );
-						if ( $logo ) {
-							echo '<img src="' . esc_url( $logo ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '" />';
-						} else {
-							// Fallback: titre du site
-							bloginfo( 'name' );
-						}
-						?>
+		<div class="site-header__inner max-width">
+			<div class="site-branding">
+				<?php if ( has_custom_logo() ) : ?>
+					<?php the_custom_logo(); ?>
+				<?php else : ?>
+					<a class="site-branding__title" href="<?php echo esc_url( $studio60_home_url ); ?>" rel="home">
+						<span class="site-branding__mark">S60</span>
+						<span><?php echo esc_html( get_bloginfo( 'name' ) ? get_bloginfo( 'name' ) : 'Studio60' ); ?></span>
 					</a>
-				</figure>
-
-				<!-- Navigation principale -->
-				<nav class="site-header__nav" role="navigation">
-					<?php
-					wp_nav_menu( [
-						'theme_location' => 'primary',
-						'menu_id'        => 'primary-menu',
-						'menu_class'     => 'primary-nav',
-						'depth'          => 2,
-						'container'      => false,
-					] );
-					?>
-				</nav>
-
-				<!-- Sélecteur de langue FR / EN -->
-				<div class="site-header__lang-selector">
-					<?php
-					// Si WPML est disponible
-					if ( function_exists( 'icl_language_switcher' ) ) {
-						echo icl_language_switcher( array( 'display_flag' => true, 'show_names' => true, 'hide_current' => false ) );
-					} else {
-						// Sinon, liens simples
-						?>
-						<div class="lang-links">
-							<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="lang-link current<?php if ( is_frontpage() ) echo ' active'; ?>">FR</a>
-							<a href="<?php echo esc_url( '/en/' ); ?>" class="lang-link<?php if ( is_home() && ! is_frontpage() ) echo ' active'; ?>">EN</a>
-						</div>
-						<?php
-					}
-					?>
-				</div>
-
-				<!-- Bouton d'action CTA -->
-				<div class="site-header__cta">
-					<a href="#contact" class="btn btn-primary">
-						<?php _e( 'Parlons de votre projet', 'studio60' ); ?>
-					</a>
-				</div>
-
+				<?php endif; ?>
 			</div>
+
+			<nav class="primary-navigation" aria-label="<?php echo esc_attr( studio60_t( 'Navigation principale' ) ); ?>">
+				<?php
+				wp_nav_menu( array(
+					'theme_location' => 'primary',
+					'menu_id'        => 'primary-menu',
+					'menu_class'     => 'primary-menu',
+					'container'      => false,
+					'fallback_cb'    => false,
+					'depth'          => 2,
+				) );
+				?>
+			</nav>
+
+			<?php
+			$studio60_languages = function_exists( 'pll_the_languages' )
+    ? pll_the_languages( array(
+        'raw' => 1,
+        'hide_if_empty' => 0,
+    ) )
+    : array();
+
+if ( is_array( $studio60_languages ) && count( $studio60_languages ) > 1 ) :
+    ?>
+    <nav class="language-switcher" aria-label="<?php echo esc_attr( studio60_t( 'Choisir la langue' ) ); ?>">
+        <?php foreach ( $studio60_languages as $language ) : ?>
+            <a
+                href="<?php echo esc_url( $language['url'] ); ?>"
+                lang="<?php echo esc_attr( $language['locale'] ); ?>"
+                class="<?php echo ! empty( $language['is_current'] ) ? 'is-active' : ''; ?>"
+                <?php echo ! empty( $language['is_current'] ) ? 'aria-current="page"' : ''; ?>
+            ><?php echo esc_html( strtoupper( $language['slug'] ) ); ?></a>
+        <?php endforeach; ?>
+    </nav>
+<?php endif; ?>
+
+			<a class="button button--small header-cta" href="<?php echo esc_url( $studio60_home_url . '#contact' ); ?>">
+				<?php echo esc_html( studio60_t( 'Parlons de votre projet' ) ); ?>
+			</a>
+
+			<button class="menu-toggle" type="button" aria-controls="mobile-navigation" aria-expanded="false">
+				<span class="menu-toggle__line"></span>
+				<span class="menu-toggle__line"></span>
+				<span class="menu-toggle__line"></span>
+				<span class="screen-reader-text"><?php echo esc_html( studio60_t( 'Ouvrir le menu' ) ); ?></span>
+			</button>
 		</div>
 
-		<!-- Menu mobile (hamburger) -->
-		<nav class="site-header__mobile-nav" aria-label="<?php _e( 'Menu principal', 'studio60' ); ?>">
-			<button class="menu-toggle" aria-expanded="false" aria-label="<?php _e( 'Ouvrir le menu', 'studio60' ); ?>">
-				<span class="menu-toggle__lines">
-					<span></span>
-					<span></span>
-					<span></span>
-				</span>
-			</button>
-			<?php
-			wp_nav_menu( [
-				'theme_location' => 'mobile',
-				'menu_id'        => 'mobile-menu',
-				'menu_class'     => 'mobile-nav',
-				'container'      => false,
-			] );
-			?>
-		</nav>
+		<div class="mobile-navigation" id="mobile-navigation" hidden>
+			<div class="max-width">
+				<?php
+				wp_nav_menu( array(
+					'theme_location' => 'primary',
+					'menu_id'        => 'mobile-menu',
+					'menu_class'     => 'mobile-menu',
+					'container'      => false,
+					'fallback_cb'    => false,
+				) );
+				?>
+				<a class="button button--primary mobile-navigation__cta" href="<?php echo esc_url( $studio60_home_url . '#contact' ); ?>">
+					<?php echo esc_html( studio60_t( 'Parlons de votre projet' ) ); ?>
+				</a>
+			</div>
+		</div>
 	</header>
 
-	<!-- Overlay mobile -->
-	<div class="site-header__mobile-overlay" id="mobile-overlay">
-		<button class="mobile-overlay__close" aria-label="<?php _e( 'Fermer le menu', 'studio60' ); ?>">&times;</button>
-		<?php
-		wp_nav_menu( [
-			'theme_location' => 'mobile',
-			'menu_id'        => 'mobile-menu',
-			'menu_class'     => 'mobile-nav-overlay',
-			'container'      => false,
-		] );
-		?>
-	</div>
-	</header>
-
-	<!-- Main content -->
 	<main id="primary" class="site-main">

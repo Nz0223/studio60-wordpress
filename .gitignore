@@ -4,3 +4,14 @@ node_modules/
 vendor/
 .env
 .env.*
+
+# Fichiers sensibles et configurations locales
+.vscode/sftp.json
+.env
+.env.*
+wp-config.php
+
+# Fichiers temporaires de l'editeur
+*.sw?
+*.sw??
+.DS_Store
